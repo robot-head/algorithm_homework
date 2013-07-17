@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strconv"
 )
 
 func partition(array []int, left int, right int, pivotIndex int) int {
@@ -32,8 +35,23 @@ func getPivot(left int, right int) int {
 }
 
 func main() {
-	array := []int{5, 2, 3, 1, 4}
-	fmt.Println(array)
-	quicksort(array, 0, 4)
-	fmt.Println(array)
+	var array []int
+	// open input file
+	fi, err := os.Open("QuickSort.txt")
+	if err != nil {
+		panic(err)
+	}
+	// close fi on exit and check for its returned error
+	// make a read buffer
+	r := bufio.NewReader(fi)
+	scanner := bufio.NewScanner(r)
+	num := 0
+	for scanner.Scan() {
+		num, err = strconv.Atoi(scanner.Text())
+		array = append(array, num)
+	}
+	
+	fmt.Println(array[0:100])
+	quicksort(array, 0, len(array) - 1)
+	fmt.Println(array[0:100])
 }
