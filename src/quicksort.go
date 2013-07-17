@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 )
 
@@ -21,17 +22,48 @@ func partition(array []int, left int, right int, pivotIndex int) int {
 	return storeIndex
 }
 
-func quicksort(array []int, left int, right int) {
+func quicksort(array []int, left int, right int) int {
+	comparisons := 0
 	if left < right {
-		pivotIndex := getPivot(left, right)
+		//pivotIndex := getPivot(left, right)
+		pivotIndex := getMedianOfThreePivotIndex(array, left, right)
 		pivotNewIndex := partition(array, left, right, pivotIndex)
-		quicksort(array, left, pivotNewIndex-1)
-		quicksort(array, pivotNewIndex+1, right)
+		comparisons += ((pivotNewIndex - 1) - left) - 1
+		comparisons += (right - (pivotNewIndex + 1)) - 1
+		comparisons += quicksort(array, left, pivotNewIndex-1)
+		comparisons += quicksort(array, pivotNewIndex+1, right)
 	}
+	return comparisons
 }
 
 func getPivot(left int, right int) int {
 	return right
+}
+
+func getMedianOfThreePivotIndex(array []int, left int, right int) int {
+	medianItem := array[(right-left)/2]
+	leftItem := array[left]
+	rightItem := array[right]
+	items := []int{leftItem, medianItem, rightItem}
+	is := &intSorter{array: array}
+	sort.Sort(is)
+	return items[2]
+}
+
+type intSorter struct {
+	array []int
+}
+
+func (i *intSorter) Len() int {
+	return len(i.array)
+}
+
+func (i *intSorter) Swap(x, y int) {
+	i.array[x], i.array[y] = i.array[y], i.array[x]
+}
+
+func (i *intSorter) Less(x, y int) bool {
+	return x < y
 }
 
 func main() {
@@ -50,8 +82,6 @@ func main() {
 		num, err = strconv.Atoi(scanner.Text())
 		array = append(array, num)
 	}
-	
-	fmt.Println(array[0:100])
-	quicksort(array, 0, len(array) - 1)
-	fmt.Println(array[0:100])
+
+	fmt.Println(quicksort(array, 0, len(array)-1))
 }
