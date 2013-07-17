@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
 	"strconv"
 )
 
@@ -22,48 +21,63 @@ func partition(array []int, left int, right int, pivotIndex int) int {
 	return storeIndex
 }
 
+func hoarePartition(A []int, pp, l, r int) int {
+	A[pp], A[l] = A[l], A[pp]
+	p := A[l]
+	i := l + 1
+	for j := l + 1; j < r; j++ {
+		if A[j] < p {
+			A[j], A[i] = A[i], A[j]
+			i++
+		}
+	}
+	A[l], A[i-1] = A[i-1], A[l]
+	return i
+}
+
 func quicksort(array []int, left int, right int) int {
 	comparisons := 0
-	if left < right {
-		//pivotIndex := getPivot(left, right)
-		pivotIndex := getMedianOfThreePivotIndex(array, left, right)
-		pivotNewIndex := partition(array, left, right, pivotIndex)
-		comparisons += ((pivotNewIndex - 1) - left) - 1
-		comparisons += (right - (pivotNewIndex + 1)) - 1
-		comparisons += quicksort(array, left, pivotNewIndex-1)
-		comparisons += quicksort(array, pivotNewIndex+1, right)
+	fmt.Print(left, ",", right, "(", right-left, ")")
+	if right-left <= 0 {
+		fmt.Print(" | ")
+		return comparisons
 	}
+
+	pivotIndex := getPivot(left, right)
+	//pivotIndex := getMedianOfThreePivotIndex(array, left, right)
+	//pivotNewIndex := partition(array, left, right, pivotIndex)
+	//fmt.Println(pivotIndex, ": ", array[pivotIndex], ". ", left, ": ", array[left])
+	
+	pivotNewIndex := hoarePartition(array, pivotIndex, left, right)
+	comparisons += (right - left) - 1
+	fmt.Print(": ", left, ",", pivotNewIndex, ",", right, " | ")
+	comparisons += quicksort(array, left, pivotNewIndex-1)
+	comparisons += quicksort(array, pivotNewIndex+1, right)
 	return comparisons
 }
 
 func getPivot(left int, right int) int {
-	return right
+	return left
 }
 
 func getMedianOfThreePivotIndex(array []int, left int, right int) int {
-	medianItem := array[(right-left)/2]
+	middleIndex := left + int((right-left)/2)
+	middleItem := array[middleIndex]
 	leftItem := array[left]
 	rightItem := array[right]
-	items := []int{leftItem, medianItem, rightItem}
-	is := &intSorter{array: array}
-	sort.Sort(is)
-	return items[2]
-}
-
-type intSorter struct {
-	array []int
-}
-
-func (i *intSorter) Len() int {
-	return len(i.array)
-}
-
-func (i *intSorter) Swap(x, y int) {
-	i.array[x], i.array[y] = i.array[y], i.array[x]
-}
-
-func (i *intSorter) Less(x, y int) bool {
-	return x < y
+	if rightItem > leftItem {
+		if middleItem > leftItem {
+			return middleIndex
+		} else {
+			return left
+		}
+	} else {
+		if middleItem > rightItem {
+			return middleIndex
+		} else {
+			return right
+		}
+	}
 }
 
 func main() {
@@ -84,4 +98,6 @@ func main() {
 	}
 
 	fmt.Println(quicksort(array, 0, len(array)-1))
+	fmt.Println(array[0:100])
+	fmt.Println(array[len(array)-100 : len(array)-1])
 }
