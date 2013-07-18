@@ -22,24 +22,27 @@ func partition(array []int, left int, right int, pivotIndex int) int {
 }
 
 func hoarePartition(A []int, pp, l, r int) int {
+	fmt.Println("Before partition: ", A[l:r], ". P: ", pp, ", l:", l, ", r:", r)
 	A[pp], A[l] = A[l], A[pp]
 	p := A[l]
 	i := l + 1
-	for j := l + 1; j < r; j++ {
+	for j := l + 1; j <= r; j++ {
 		if A[j] < p {
 			A[j], A[i] = A[i], A[j]
 			i++
 		}
 	}
+	fmt.Println("Before final swap: ", A[l:r], ". P: ", pp, ", l:", l, ", r:", r)
 	A[l], A[i-1] = A[i-1], A[l]
+	fmt.Println("After partition: ", A[l:r], ". P: ", i, ", l:", l, ", r:", r)
 	return i
 }
 
 func quicksort(array []int, left int, right int) int {
 	comparisons := 0
-	fmt.Print(left, ",", right, "(", right-left, ")")
+	//fmt.Print(left, ",", right, "(", right-left, ")")
 	if right-left <= 0 {
-		fmt.Print(" | ")
+		//fmt.Print(" | ")
 		return comparisons
 	}
 
@@ -50,7 +53,7 @@ func quicksort(array []int, left int, right int) int {
 	
 	pivotNewIndex := hoarePartition(array, pivotIndex, left, right)
 	comparisons += (right - left) - 1
-	fmt.Print(": ", left, ",", pivotNewIndex, ",", right, " | ")
+	//fmt.Print(": ", left, ",", pivotNewIndex, ",", right, " | ")
 	comparisons += quicksort(array, left, pivotNewIndex-1)
 	comparisons += quicksort(array, pivotNewIndex+1, right)
 	return comparisons
